@@ -439,13 +439,7 @@ func Configure(p *config.Provider) { //nolint:gocyclo
 			Extractor:     `github.com/crossplane/upjet/v2/pkg/resource.ExtractParamPath("gateway_arn",true)`,
 		}
 		if len(r.MetaResource.Examples) > 0 {
-			example := &r.MetaResource.Examples[0]
-			if err := example.SetPathValue("resource_arn", "${aws_bedrockagentcore_gateway.example.gateway_arn}"); err != nil {
-				panic(err)
-			}
-			example.References["resource_arn"] = "aws_bedrockagentcore_gateway.example.gateway_arn"
-			delete(example.Dependencies, "aws_bedrockagentcore_agent_runtime.example")
-			example.Dependencies["aws_bedrockagentcore_gateway.example"] = "{}"
+			delete(r.MetaResource.Examples[0].References, "resource_arn")
 		}
 	})
 	// aws_bedrockagentcore_token_vault_cmk
