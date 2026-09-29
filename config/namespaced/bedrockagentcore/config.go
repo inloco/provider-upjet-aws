@@ -434,7 +434,19 @@ func Configure(p *config.Provider) { //nolint:gocyclo
 	})
 	// aws_bedrockagentcore_resource_policy
 	p.AddResourceConfigurator("aws_bedrockagentcore_resource_policy", func(r *config.Resource) {
-		delete(r.References, "resource_arn")
+		r.References["resource_arn"] = config.Reference{
+			TerraformName: "aws_bedrockagentcore_gateway",
+			Extractor:     `github.com/crossplane/upjet/v2/pkg/resource.ExtractParamPath("gateway_arn",true)`,
+		}
+		if len(r.MetaResource.Examples) > 0 {
+			example := &r.MetaResource.Examples[0]
+			if err := example.SetPathValue("resource_arn", "${aws_bedrockagentcore_gateway.example.gateway_arn}"); err != nil {
+				panic(err)
+			}
+			example.References["resource_arn"] = "aws_bedrockagentcore_gateway.example.gateway_arn"
+			delete(example.Dependencies, "aws_bedrockagentcore_agent_runtime.example")
+			example.Dependencies["aws_bedrockagentcore_gateway.example"] = "{}"
+		}
 	})
 	// aws_bedrockagentcore_token_vault_cmk
 	p.AddResourceConfigurator("aws_bedrockagentcore_token_vault_cmk", func(r *config.Resource) {

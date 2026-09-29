@@ -16,12 +16,14 @@ spec:
   forProvider:
     policy: ${data.aws_iam_policy_document.example.json}
     region: us-west-1
-    resourceArn: ${aws_bedrockagentcore_agent_runtime.example.agent_runtime_arn}
+    resourceArnSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example
 
 ---
 
 apiVersion: bedrockagentcore.aws.m.upbound.io/v1beta1
-kind: AgentRuntime
+kind: Gateway
 metadata:
   annotations:
     meta.upbound.io/example-id: bedrockagentcore/v1beta1/resourcepolicy
@@ -30,5 +32,4 @@ metadata:
   name: example
   namespace: upbound-system
 spec:
-  forProvider:
-    region: us-west-1
+  forProvider: {}

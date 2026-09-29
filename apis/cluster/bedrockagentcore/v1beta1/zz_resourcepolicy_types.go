@@ -45,8 +45,18 @@ type ResourcePolicyParameters struct {
 	Region *string `json:"region" tf:"region,omitempty"`
 
 	// ARN of the resource for which to create or update the resource policy.
-	// +kubebuilder:validation:Required
-	ResourceArn *string `json:"resourceArn" tf:"resource_arn,omitempty"`
+	// +crossplane:generate:reference:type=github.com/upbound/provider-aws/v2/apis/cluster/bedrockagentcore/v1beta1.Gateway
+	// +crossplane:generate:reference:extractor=github.com/crossplane/upjet/v2/pkg/resource.ExtractParamPath("gateway_arn",true)
+	// +kubebuilder:validation:Optional
+	ResourceArn *string `json:"resourceArn,omitempty" tf:"resource_arn,omitempty"`
+
+	// Reference to a Gateway in bedrockagentcore to populate resourceArn.
+	// +kubebuilder:validation:Optional
+	ResourceArnRef *v2.Reference `json:"resourceArnRef,omitempty" tf:"-"`
+
+	// Selector for a Gateway in bedrockagentcore to populate resourceArn.
+	// +kubebuilder:validation:Optional
+	ResourceArnSelector *v2.Selector `json:"resourceArnSelector,omitempty" tf:"-"`
 }
 
 // ResourcePolicySpec defines the desired state of ResourcePolicy

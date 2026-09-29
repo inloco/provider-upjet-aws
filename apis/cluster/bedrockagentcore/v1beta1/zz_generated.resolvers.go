@@ -3158,6 +3158,38 @@ func (mg *PolicyEngine) ResolveReferences(ctx context.Context, c client.Reader) 
 	return nil
 }
 
+// ResolveReferences of this ResourcePolicy.
+func (mg *ResourcePolicy) ResolveReferences(ctx context.Context, c client.Reader) error {
+	var m xpresource.Managed
+	var l xpresource.ManagedList
+	r := reference.NewAPIResolver(c, mg)
+
+	var rsp reference.ResolutionResponse
+	var err error
+	{
+		m, l, err = apisresolver.GetManagedResource("bedrockagentcore.aws.upbound.io", "v1beta1", "Gateway", "GatewayList")
+		if err != nil {
+			return errors.Wrap(err, "failed to get the reference target managed resource and its list for reference resolution")
+		}
+
+		rsp, err = r.Resolve(ctx, reference.ResolutionRequest{
+			CurrentValue: reference.FromPtrValue(mg.Spec.ForProvider.ResourceArn),
+			Extract:      resource.ExtractParamPath("gateway_arn", true),
+			Namespace:    mg.GetNamespace(),
+			Reference:    mg.Spec.ForProvider.ResourceArnRef,
+			Selector:     mg.Spec.ForProvider.ResourceArnSelector,
+			To:           reference.To{List: l, Managed: m},
+		})
+	}
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.ResourceArn")
+	}
+	mg.Spec.ForProvider.ResourceArn = reference.ToPtrValue(rsp.ResolvedValue)
+	mg.Spec.ForProvider.ResourceArnRef = rsp.ResolvedReference
+
+	return nil
+}
+
 // ResolveReferences of this TokenVaultCmk.
 func (mg *TokenVaultCmk) ResolveReferences(ctx context.Context, c client.Reader) error {
 	var m xpresource.Managed
